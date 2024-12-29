@@ -51,7 +51,7 @@ def handle_request(client_socket, client_address):
         with lock:  
                 connect -= 1
 
-def start_server(host='0.0.0.0', max_connec = 5, port=8000):
+def start_server(host='0.0.0.0', max_connec = 5, port=80):
     global max_connection
     max_connection = max_connec
 
