@@ -1,3 +1,11 @@
 {
-    "max_connection": 10
+    "max_connection": 100,
+
+    "server": [
+        {
+            "domain": "hcmutssps.id.vn",
+            "priv_key": "...",
+            "fullchain": "..."
+        }
+    ]
 }
