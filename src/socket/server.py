@@ -1,3 +1,4 @@
+import json
 import socket
 import time
 import signal
@@ -16,8 +17,8 @@ Content-Type: text/plain
 Giới hạn kết nối
 """
 
+from src.data.var import max_connection
 connect = 0
-max_connection = 5
 CERT_FILE = "/etc/letsencrypt/live/hcmutssps.id.vn/fullchain.pem"
 KEY_FILE = "/etc/letsencrypt/live/hcmutssps.id.vn/privkey.pem"
 lock = threading.Lock()
@@ -31,9 +32,8 @@ def handle_request(client_socket, client_address):
         if(connect >= max_connection):
             print("Giới hạn kết nối, kết nối thất bại!\n")
             client_socket.send(http_error.encode('utf-8'))
-            client_socket.close()
         else:
-            # print(f"Request receive:\n {rev}")
+            print(f"Request receive:\n {rev}")
             print(f"Connection from {client_address}, số lượng kết nối: {connect}/{max_connection}\n")
             with lock: 
                 connect += 1
@@ -54,15 +54,14 @@ def handle_request(client_socket, client_address):
         with lock:  
                 connect -= 1
 
-def start_server(host='0.0.0.0', max_connec = 5, port=443):
+def start_server(host='0.0.0.0', port=443):
     global max_connection
-    max_connection = max_connec
 
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_socket.bind((host, port))
     server_socket.listen(max_connection)
     print(f"Server is listening on {host}:{port}")
-    print(f"Số host tối đa: {max_connec}")
+    print(f"Số host tối đa: {max_connection}")
 
     # Chuyển socket sang HTTPS với chứng chỉ SSL
     context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)

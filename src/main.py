@@ -1,10 +1,13 @@
-from src.socket.server import start_server   
 import json
 
-data = None
-
 if __name__ == "__main__":
-    with open('config.json', 'r') as file:
-        data = json.load(file)
+    from src.data import var
     
-    start_server(max_connec=data.get('max_connection', 10))
+    # Nạp biến từ file config
+    var.init()
+
+    #Nạp hàm khởi chạy socket
+    from src.socket.server import start_server   
+
+    # Chạy socket
+    start_server()

@@ -1,11 +1,20 @@
 {
     "max_connection": 100,
 
-    "server": [
-        {
-            "domain": "hcmutssps.id.vn",
-            "priv_key": "...",
-            "fullchain": "..."
+    "server": {
+        "hcmutssps.id.vn": {
+            "ssl": {
+                "cert": "/etc/letsencrypt/live/hcmutssps.id.vn/fullchain.pem",
+                "key": "/etc/letsencrypt/live/hcmutssps.id.vn/privkey.pem"
+            },
+            "location": [
+                {
+                    "/": "localhost:3000"
+                },
+                {
+                    "/docs": "localhost:8080"
+                }
+            ]
         }
-    ]
+    }
 }
