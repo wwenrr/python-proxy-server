@@ -39,10 +39,10 @@ def handle_request(client_socket, client_address):
                 connect += 1
             
             client_socket.send(http_wait.encode())
-            time.sleep(1)
-            client_socket.send("chờ xíu bro\n".encode('utf-8'))
-            time.sleep(5)
-            client_socket.send("hello world".encode('utf-8'))
+            # time.sleep(1)
+            client_socket.send("hello world\n".encode('utf-8'))
+            # time.sleep(5)
+            client_socket.send(":vvvvv".encode('utf-8'))
     except BrokenPipeError:
         print("Client hủy kết nối đột ngột")
     except OSError as e:
