@@ -9,12 +9,16 @@
             },
             "location": [
                 {
-                    "/": "localhost:3000"
+                    "/hello": "localhost:8000"
                 },
                 {
                     "/docs": "localhost:8080"
+                },
+                {
+                    "/a/b/c": "localhost:8080"
                 }
             ]
         }
     }
 }
+

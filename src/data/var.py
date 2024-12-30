@@ -6,6 +6,7 @@ File Dữ Liệu Chính Của Server
 data: Dữ liệu chung từ config.json
 server: Các khối server để ánh xạ dữ liệu
 max_connection: Số kết nối tối đa tới proxy
+ssl_context: Danh sách các key
 '''
 
 def init():
