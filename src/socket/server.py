@@ -18,9 +18,10 @@ Giới hạn kết nối
 """
 
 from src.data.var import max_connection
+from src.data.var import server
+
 connect = 0
-CERT_FILE = "/etc/letsencrypt/live/hcmutssps.id.vn/fullchain.pem"
-KEY_FILE = "/etc/letsencrypt/live/hcmutssps.id.vn/privkey.pem"
+
 lock = threading.Lock()
 
 def handle_request(client_socket, client_address):
@@ -33,8 +34,7 @@ def handle_request(client_socket, client_address):
             print("Giới hạn kết nối, kết nối thất bại!\n")
             client_socket.send(http_error.encode('utf-8'))
         else:
-            print(f"Request receive:\n {rev}")
-            print(f"Connection from {client_address}, số lượng kết nối: {connect}/{max_connection}\n")
+            print(f"Connection from {client_address}, số lượng kết nối: {connect}/{max_connection} \n")
             with lock: 
                 connect += 1
             
@@ -48,39 +48,46 @@ def handle_request(client_socket, client_address):
     except OSError as e:
         print(f"OS error: {e}")
     except Exception as e:  
-        print(f"Có lỗi xảy ra: {e}")
+        print(f"Có lỗi xảy ra: {e} \n")
     finally:
         client_socket.close()
         with lock:  
                 connect -= 1
 
-def start_server(host='0.0.0.0', port=443):
-    global max_connection
+def start_server(port=443):
+    try:
+        from src.socket.helper import sni_gen
 
-    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_socket.bind((host, port))
-    server_socket.listen(max_connection)
-    print(f"Server is listening on {host}:{port}")
-    print(f"Số host tối đa: {max_connection}")
+        global max_connection
 
-    # Chuyển socket sang HTTPS với chứng chỉ SSL
-    context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
-    context.load_cert_chain(certfile="/etc/letsencrypt/live/hcmutssps.id.vn/fullchain.pem",
-                            keyfile="/etc/letsencrypt/live/hcmutssps.id.vn/privkey.pem")
+        # Tạo context để wrap https :v
+        main_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+        main_context.sni_callback = sni_gen
 
-    server_socket = context.wrap_socket(server_socket, server_side=True)
+        # Tạo socket
+        server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        server_socket.bind(("0.0.0.0", port))
+        server_socket.listen(2)
+        print(f"Server is listening on {port}")
+        print(f"Số host tối đa: {max_connection} \n-----------------------------------------------\n")
 
-    def handle_signal(signum, frame):
-        print("\nServer is shutting down...")
+        # Bọc socket = https
+        server_socket = main_context.wrap_socket(server_socket, server_side=True)
+
+        def handle_signal(signum, frame):
+            print("\nServer is shutting down...")
+            server_socket.close()
+            sys.exit(0)  
+
+        signal.signal(signal.SIGINT, handle_signal)
+
+        while True:
+            try:
+                client_socket, client_address = server_socket.accept()
+                thread = threading.Thread(target=handle_request, args=(client_socket, client_address))
+                thread.start()
+            except Exception as e:  
+                print(f"Có lỗi xảy ra: {e}")
+    finally:
         server_socket.close()
-        sys.exit(0)  
-
-    signal.signal(signal.SIGINT, handle_signal)
-
-    while True:
-        try:
-            client_socket, client_address = server_socket.accept()
-            thread = threading.Thread(target=handle_request, args=(client_socket, client_address))
-            thread.start()
-        except Exception as e:  
-            print(f"Có lỗi xảy ra: {e}")

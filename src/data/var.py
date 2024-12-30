@@ -13,7 +13,14 @@ def init():
     global server
     global data
 
-    with open('config.json', 'r') as file:
-        data = json.load(file)
-        server = data['server']
-        max_connection = data['max_connection']
+    try:
+        with open('config.json', 'r') as file:
+            data = json.load(file)
+            server = data['server']
+            max_connection = data['max_connection']
+
+            if(data == None or server == None or max_connection == None):
+                raise Exception("Không tìm thấy dữ liệu")
+    except Exception as e:
+        print(e.message)
+        exit(0)

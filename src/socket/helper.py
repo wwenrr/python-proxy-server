@@ -1,24 +1,23 @@
 import json
 
-def get_cert(domain):
-    print("hello")
+def sni_gen(sock, server_name, context):
+    try:
+        from src.data.var import server
 
-def parse_http_request(request):
-    lines = request.splitlines()
-    method, path, _ = lines[0].split(" ")  # GET / HTTP/1.1
-    headers = {}
+        print(f"Connection to {server_name}")
 
-    # Parse các header từ dòng 2 trở đi
-    for line in lines[1:]:
-        if ":" in line:
-            key, value = line.split(":", 1)
-            headers[key.strip()] = value.strip()
+        if server_name not in server:
+            raise Exception("Domain không tồn tại trong file config")
+        
+        if "ssl" not in server[server_name]:
+            raise Exception("Chứng chỉ ssl chưa được config")
 
-    # Tạo JSON từ các phần đã phân tích
-    request_data = {
-        "method": method,
-        "path": path,
-        "headers": headers
-    }
-
-    return json.dumps(request_data, indent=4)
+        ssl = server[server_name]['ssl']
+    
+        context.load_cert_chain(
+            certfile=ssl['cert'],
+            keyfile=ssl['key']
+        )
+    except Exception as e:
+        print(f"lỗi: {str(e)}")
+        raise
