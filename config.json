@@ -7,16 +7,12 @@
                 "cert": "/etc/letsencrypt/live/hcmutssps.id.vn/fullchain.pem",
                 "key": "/etc/letsencrypt/live/hcmutssps.id.vn/privkey.pem"
             },
-            "location": [
-                {
-                    "/hello": "localhost:8000"
-                },
-                {
-                    "/docs": "localhost:8080"
-                },
-                {
-                    "/a/b/c": "localhost:8080"
-                }
+            "load_balancin_algorithm": "round_robin",
+            "forwarding": [
+                "localhost:8000",
+                "localhost:3000",
+                "localhost:3000",
+                "localhost:8000"
             ]
         }
     }

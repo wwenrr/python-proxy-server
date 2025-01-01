@@ -7,7 +7,7 @@ if __name__ == "__main__":
     var.init()
 
     #Nạp hàm khởi chạy socket
-    from src.socket.server import start_server   
+    from src.socket.server import start_proxy   
 
     # Chạy socket
-    start_server()
+    start_proxy()

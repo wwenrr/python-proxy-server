@@ -4,8 +4,20 @@ from src.data.var import server
 '''
 Dữ Liệu:
 
+domain: Domain sau khi phân giải dns
 ssl_context: Đối tượng chứa danh sách các ssl
 '''
+
+def sni_gen(sock, server_name, context):
+    from src.exception.DomainNotFound import DomainNotFound
+
+    global domain
+    
+    if server_name not in server:
+        domain = "u r dead idiot"
+        print("Domain not found")
+    else:
+        domain = server_name
 
 def ssl_loader(main_context):
     for domain, config in server.items():
@@ -18,23 +30,3 @@ def ssl_loader(main_context):
             except Exception as e:
                 print(f"\033[31mLỗi khi nạp chứng chỉ SSL cho domain {domain}: \033[0m{str(e)}")
                 exit(0)
-
-def sni_gen(sock, server_name, context):
-    try:
-        from src.data.var import server
-
-        if server_name not in server:
-            raise Exception("Domain không tồn tại trong file config")
-        
-        if "ssl" not in server[server_name]:
-            raise Exception("Chứng chỉ ssl chưa được config")
-
-        ssl = server[server_name]['ssl']
-    
-        context.load_cert_chain(
-            certfile=ssl['cert'],
-            keyfile=ssl['key']
-        )
-    except Exception as e:
-        print(f"lỗi: {str(e)}")
-        raise
